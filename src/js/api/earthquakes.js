@@ -1,14 +1,13 @@
-export async function getEarthquakes(lat, lon) {
+export async function getEarthquakes(lat, lon, radius) {
     const today = new Date()
     const formatted = today.toISOString().split('T')[0]
     const params = new URLSearchParams({
         format: 'geojson',
         latitude: lat,
         longitude: lon,
-        maxradiuskm: 60,
+        maxradiuskm: radius,
         starttime: '1900-01-01',
-        endtime: formatted,
-        limit: 2000
+        endtime: formatted
     })
 
   const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?${params}`
