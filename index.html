@@ -7,9 +7,32 @@
     <title>seismo-stats-app</title>
   </head>
   <body>
-    <input type="text" id="cityInput" placeholder="Introduce una ciudad">
-    <button id="searchBtn">Buscar</button>
-    <span id="dataSpan"></span>
+
+      <input type="text" id="cityInput" placeholder="Introduce una ciudad">
+      <select id="maxRadius" name="max-radius" required>
+        <option value="10">10km</option>
+        <option value="25">25km</option>
+        <option value="50">50km</option>
+        <option value="100">100km</option>
+        <option value="200">200km</option>
+      </select>
+      <button id="searchBtn">Buscar</button>
+
+    <section>
+      <h2>Terremotos totales</h2>
+      <p id="total-earthquakes"></p>
+    </section>
+
+    <section>
+      <h2>Magnitud media</h2>
+      <p id="mean-magnitude"></p>
+    </section>
+
+    <section>
+      <h2>Máxima magnitude</h2>
+      <p id="max-magnitude"></p>
+    </section>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
