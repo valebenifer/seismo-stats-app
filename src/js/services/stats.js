@@ -1,16 +1,23 @@
 export function getMagnitudeStats(quakes) {
-  let sum = 0;
-  let max = -Infinity;
-  let count = quakes.length;
+  const validQuakes = quakes.filter(q => typeof q.properties.mag === 'number');
 
-  for (const quake of quakes) {
-    const mag = quake.properties.mag;
-    
-    sum += mag;
-    if (mag > max) max = mag;
+  if (validQuakes.length === 0) {
+    return { mean: '-', max: '-', maxEvent: null };
   }
 
-  const mean = Number((sum / count).toFixed(2));
+  const mags = validQuakes.map(q => q.properties.mag);
+  const sum = mags.reduce((acc, m) => acc + m, 0);
+  const mean = Number((sum / mags.length).toFixed(2));
 
-  return { mean, max };
+  const maxEvent = validQuakes.reduce((maxQ, currentQ) => {
+    return currentQ.properties.mag > maxQ.properties.mag ? currentQ : maxQ;
+  });
+
+  const max = maxEvent.properties.mag;
+
+  return {
+    mean,
+    max,
+    maxEvent 
+  };
 }
