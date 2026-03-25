@@ -35,12 +35,15 @@ export function paintChart(quakes) {
 }
 
 export function depthDistribution(quakes) {
-    const dataAxis = quakes.map(quake => {
-        return {
-            x: quake.geometry.coordinates[2],
-            y: quake.properties.mag
-        };
-    });
+    const dataAxis = quakes
+    .filter(quake => {
+        const x = quake.geometry?.coordinates?.[2];
+        return x !== 0 && x !== null && x !== undefined;
+    })
+    .map(quake => ({
+        x: quake.geometry.coordinates[2],
+        y: quake.properties.mag
+    }));
 
     const canvas = document.getElementById('depth-distribution');
 
@@ -75,19 +78,34 @@ export function depthDistribution(quakes) {
     let dataMaxEvent;
     quakes.forEach(quake => {
 
-        if ((quake.geometry.coordinates[2] >= maxMag) && (quake.properties.mag <= minProf)) {
-   
-            maxMag = quake.geometry.coordinates[2];
-            minProf = quake.properties.mag;
+        const mag = quake.properties.mag;
+        const depth = quake.geometry.coordinates[2];
+
+        if (depth == null || depth === 0 || mag == null) {
+            return;
+        }
+
+        if (
+            mag > maxMag ||
+            (mag === maxMag && depth < minProf)
+        ) {
+            maxMag = mag;
+            minProf = depth;
 
             const date = new Date(quake.properties.time);
             const formatted = `${date.getFullYear()}/${
-            String(date.getMonth() + 1).padStart(2, '0')
+                String(date.getMonth() + 1).padStart(2, '0')
             }/${
-            String(date.getDate()).padStart(2, '0')
+                String(date.getDate()).padStart(2, '0')
             }`;
-            dataMaxEvent = formatted + ' - ' + ' Magnitud ' + quake.properties.mag + ' - ' + quake.properties.place;
-            console.log(dataMaxEvent);
+
+            dataMaxEvent =
+                formatted +
+                ' - Magnitud ' + maxMag +
+                ' - ' + minProf + 'km de profundidad - ' +
+                quake.properties.place +
+                ' - URL: ' +
+                quake.properties.url;
         }
         
     })

@@ -14,7 +14,6 @@
         <option value="25">25km</option>
         <option value="50">50km</option>
         <option value="100">100km</option>
-        <option value="200">200km</option>
       </select>
       <button id="searchBtn">Buscar</button>
 
@@ -49,6 +48,16 @@
       <p id="max-event-depth-distribution"></p>
       <canvas id="depth-distribution"></canvas>
     </section>
+
+    <section>
+      <h2>Tabla de probabilidades</h2>
+      <table id="probability-table"></table>
+    </section>
+
+    <div id="loading" class="hidden">
+      <i class="bi bi-arrow-repeat spinner"></i>
+      <span>Cargando...</span>
+    </div>
 
     <script type="module" src="/src/main.js"></script>
   </body>

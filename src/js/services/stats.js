@@ -44,3 +44,65 @@ export function averageTimeBetween(quakes) {
 
   return Number(average.toFixed(2));
 }
+
+export function earthquakeProbabilityTable(
+  quakes,
+  yearsAhead = 1,
+  magnitudes = [4, 5, 6]
+) {
+  if (!quakes || quakes.length === 0) return [];
+
+  const sorted = [...quakes].sort(
+    (a, b) => a.properties.time - b.properties.time
+  );
+
+  const firstDate = sorted[0].properties.time;
+  const lastDate = sorted[sorted.length - 1].properties.time;
+
+  const totalYears =
+    (lastDate - firstDate) / (1000 * 60 * 60 * 24 * 365);
+
+  if (totalYears <= 0) return [];
+
+  const getRisk = (probability) => {
+    if (probability < 0.05) return "Muy bajo";
+    if (probability < 0.15) return "Bajo";
+    if (probability < 0.35) return "Moderado";
+    if (probability < 0.65) return "Alto";
+    return "Muy alto";
+  };
+
+  const results = magnitudes.map((minMagnitude) => {
+    const filtered = quakes.filter(
+      q => q.properties.mag >= minMagnitude
+    );
+
+    const events = filtered.length;
+
+    if (events === 0) {
+      return {
+        minMagnitude,
+        events: 0,
+        lambda: 0,
+        probability: 0,
+        percentage: "0.00",
+        risk: "Muy bajo"
+      };
+    }
+
+    const lambda = events / totalYears;
+    const probability = 1 - Math.exp(-lambda * yearsAhead);
+
+    return {
+      minMagnitude,
+      events,
+      lambda: lambda.toFixed(3),
+      probability,
+      percentage: (probability * 100).toFixed(2),
+      risk: getRisk(probability)
+    };
+  });
+
+  return results;
+}
+
