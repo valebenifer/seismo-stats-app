@@ -1,6 +1,28 @@
 import { getMagnitudeStats, averageTimeBetween, earthquakeProbabilityTable } from '../services/stats.js'
 import { paintChart, depthDistribution } from './charts.js'
-import { buildMaxEventText } from '../utils/helpers.js'
+import { buildMaxEventText, formatDate } from '../utils/helpers.js'
+
+export function renderMainData(quakes) {
+  const table = document.getElementById('top-5-earthquakes');
+  table.innerHTML = `
+    <tr>
+      <th>Fecha</th>
+      <th>Magnitud (MB)</th>
+      <th>Profundidad</th>
+      <th>Lugar</th>
+      <th>Más informaciópn</th>
+    </tr>
+    ${quakes.map(row => `
+      <tr>
+        <td>${formatDate(row.properties.time)}</td>
+        <td>${row.properties.mag}</td>
+        <td>${row.geometry.coordinates[2]}km</td>
+        <td>${row.properties.place}</td>
+        <td>${row.properties.url}</td>
+      </tr>
+    `).join('')}
+  `;
+}
 
 export function renderAll(quakes) {
   renderTotal(quakes.length)

@@ -2,10 +2,19 @@ import './styles/style.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import { getCoordinates } from './js/api/geocoding.js'
-import { getEarthquakes } from './js/api/earthquakes.js'
-import { renderAll, renderNoResults } from './js/ui/render.js'
+import { getEarthquakes, top5DangeorusEarthqueakes } from './js/api/earthquakes.js'
+import { renderAll, renderNoResults, renderMainData } from './js/ui/render.js'
 import { getCityInput, getRadiusInput } from './js/utils/helpers.js'
 import { showLoading, hideLoading } from './js/ui/render.js'
+
+window.onload = async () => {
+  try {
+    const top5 = await top5DangeorusEarthqueakes();
+    renderMainData(top5);
+  } catch (error) {
+    console.error("Error al cargar los datos:", error);
+  }
+};
 
 document.getElementById('searchBtn').addEventListener('click', async () => {
   try {
