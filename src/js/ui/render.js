@@ -1,4 +1,4 @@
-import { getMagnitudeStats, averageTimeBetween, earthquakeProbabilityTable } from '../services/stats.js'
+import { getMagnitudeStats, averageTimeBetween, earthquakeProbabilityTable, last5Earthquakes } from '../services/stats.js'
 import { paintChart, depthDistribution } from './charts.js'
 import { buildMaxEventText, formatDate } from '../utils/helpers.js'
 
@@ -39,6 +39,9 @@ export function renderAll(quakes) {
 
   const tableData = earthquakeProbabilityTable(quakes, 1)
   renderProbabilityTable(tableData)
+
+  const lastQuakes = last5Earthquakes(quakes)
+  renderLastQuakes(lastQuakes)
 }
 
 function renderTotal(count) {
@@ -80,6 +83,28 @@ function renderProbabilityTable(data) {
         <td>${row.events}</td>
         <td>${row.percentage}%</td>
         <td>${row.risk}</td>
+      </tr>
+    `).join('')}
+  `;
+}
+
+function renderLastQuakes(lastQuakes) {
+  const table = document.getElementById('last-earthquakes');
+  table.innerHTML = `
+    <tr>
+      <th>Fecha</th>
+      <th>Magnitud (MB)</th>
+      <th>Profundidad</th>
+      <th>Lugar</th>
+      <th>Más informaciópn</th>
+    </tr>
+    ${lastQuakes.map(row => `
+      <tr>
+        <td>${formatDate(row.properties.time)}</td>
+        <td>${row.properties.mag}</td>
+        <td>${row.geometry.coordinates[2]}km</td>
+        <td>${row.properties.place}</td>
+        <td>${row.properties.url}</td>
       </tr>
     `).join('')}
   `;
