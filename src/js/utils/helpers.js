@@ -9,6 +9,10 @@ export function formatDate(timestamp) {
 }
 
 export function buildMaxEventText(event) {
+  if (!event || !event.properties || !event.geometry) {
+    return '-'
+  }
+
   return `${formatDate(event.properties.time)} 
   - Magnitud ${event.properties.mag} 
   - ${event.geometry.coordinates[2]}km de profundidad
@@ -16,7 +20,7 @@ export function buildMaxEventText(event) {
 }
 
 export function getCityInput() {
-  return document.getElementById('cityInput').value
+  return document.getElementById('cityInput').value.trim()
 }
 
 export function getRadiusInput() {

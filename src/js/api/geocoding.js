@@ -1,12 +1,29 @@
 export async function getCoordinates(city) {
-    const API_KEY = '730bbb45ca95474d89168dc9ee3e20cc';
+    const normalizedCity = city?.trim();
+    if (!normalizedCity) {
+        throw new Error('Debes introducir una ciudad valida.');
+    }
 
-    const res = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${city}&key=${API_KEY}`);
+    const params = new URLSearchParams({
+        q: normalizedCity,
+        format: 'jsonv2',
+        limit: '1'
+    });
+
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`);
+
+    if (!res.ok) {
+        throw new Error(`Error al geocodificar la ciudad: ${res.status} ${res.statusText}`);
+    }
 
     const data = await res.json();
 
+    if (!Array.isArray(data) || data.length === 0) {
+        throw new Error('No se han encontrado coordenadas para esa ciudad.');
+    }
+
     return {
-        lat: data.results[0].geometry.lat,
-        lon: data.results[0].geometry.lng
+        lat: Number(data[0].lat),
+        lon: Number(data[0].lon)
     }
 }

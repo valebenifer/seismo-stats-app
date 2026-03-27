@@ -1,7 +1,9 @@
-const today = new Date()
-let formatted = today.toISOString().split('T')[0]
+function getISODate(date = new Date()) {
+  return date.toISOString().split('T')[0]
+}
 
 export async function getEarthquakes(lat, lon, radius) {
+    const endtime = getISODate()
 
     const params = new URLSearchParams({
         format: 'geojson',
@@ -9,7 +11,7 @@ export async function getEarthquakes(lat, lon, radius) {
         longitude: lon,
         maxradiuskm: radius,
         starttime: '1900-01-01',
-        endtime: formatted
+        endtime
     })
 
   const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?${params}`
@@ -22,15 +24,16 @@ export async function getEarthquakes(lat, lon, radius) {
 
   const data = await res.json()
 
-  return data.features
+  return Array.isArray(data.features) ? data.features : []
 }
 
-export async function top5DangeorusEarthqueakes() {
+export async function top5DangerousEarthquakes() {
+  const endtime = getISODate()
   const params = new URLSearchParams({
         format: 'geojson',
         minmagnitude: 8,
         starttime: '1900-01-01',
-        endtime: formatted
+        endtime
     })
 
   const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?${params}`
@@ -42,7 +45,7 @@ export async function top5DangeorusEarthqueakes() {
 
   const data = await res.json()
 
-  const top5 = data.features
+  const top5 = (Array.isArray(data.features) ? data.features : [])
   .sort((a, b) => b.properties.mag - a.properties.mag)
   .slice(0, 5)
 

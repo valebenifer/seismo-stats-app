@@ -107,7 +107,7 @@ export function earthquakeProbabilityTable(
 }
 
 export function last5Earthquakes(quakes) {
-    const lastQuakes = quakes
+  const lastQuakes = [...quakes]
       .sort((a, b) => b.properties.time - a.properties.time)
       .slice(0,5);
 

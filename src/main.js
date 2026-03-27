@@ -2,19 +2,19 @@ import './styles/style.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import { getCoordinates } from './js/api/geocoding.js'
-import { getEarthquakes, top5DangeorusEarthqueakes } from './js/api/earthquakes.js'
+import { getEarthquakes, top5DangerousEarthquakes } from './js/api/earthquakes.js'
 import { renderAll, renderNoResults, renderMainData } from './js/ui/render.js'
 import { getCityInput, getRadiusInput } from './js/utils/helpers.js'
 import { showLoading, hideLoading } from './js/ui/render.js'
 
-window.onload = async () => {
+window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const top5 = await top5DangeorusEarthqueakes();
-    renderMainData(top5);
+    const top5 = await top5DangerousEarthquakes()
+    renderMainData(top5)
   } catch (error) {
-    console.error("Error al cargar los datos:", error);
+    console.error('Error al cargar los datos iniciales:', error)
   }
-};
+})
 
 document.getElementById('searchBtn').addEventListener('click', async () => {
   try {
@@ -28,13 +28,13 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 
     if (quakes.length > 0) {
       renderAll(quakes)
-      console.log(quakes)
     } else {
-      renderNoResults()
+      renderNoResults('No hay terremotos para esta búsqueda.')
     }
 
   } catch (error) {
     console.error(error)
+    renderNoResults(error?.message || 'Ha ocurrido un error al procesar la búsqueda.')
   } finally {
     hideLoading()
   }
