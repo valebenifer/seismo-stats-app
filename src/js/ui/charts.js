@@ -1,5 +1,52 @@
 import Chart from 'chart.js/auto'
 
+const theme = {
+    text: '#F5F5F5',
+    muted: '#919599',
+    accent: '#D84A4A',
+    accentSoft: 'rgba(216, 74, 74, 0.22)',
+    grid: 'rgba(145, 149, 153, 0.14)'
+}
+
+function buildBaseOptions() {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: theme.text
+                }
+            },
+            tooltip: {
+                backgroundColor: '#121212',
+                titleColor: theme.text,
+                bodyColor: theme.text,
+                borderColor: theme.grid,
+                borderWidth: 1
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: theme.muted
+                },
+                grid: {
+                    color: theme.grid
+                }
+            },
+            y: {
+                ticks: {
+                    color: theme.muted
+                },
+                grid: {
+                    color: theme.grid
+                }
+            }
+        }
+    }
+}
+
 export function paintChart(quakes) {
     const counts = {};
 
@@ -27,10 +74,16 @@ export function paintChart(quakes) {
             datasets: [
                 {
                     label: 'Terremotos por año',
-                    data: data.map(row => row.count)
+                    data: data.map(row => row.count),
+                    backgroundColor: theme.accentSoft,
+                    borderColor: theme.accent,
+                    borderWidth: 1.5,
+                    borderRadius: 10,
+                    hoverBackgroundColor: theme.accent
                 }
             ]
-        }
+        },
+        options: buildBaseOptions()
     });
 }
 
@@ -54,9 +107,12 @@ export function depthDistribution(quakes) {
 
     const data = {
         datasets: [{
-            label: 'Scatter Dataset',
+            label: 'Magnitud por profundidad',
             data: dataAxis,
-            backgroundColor: 'rgb(255, 99, 132)'
+            backgroundColor: theme.accent,
+            borderColor: theme.accent,
+            pointRadius: 5,
+            pointHoverRadius: 7
         }],
     };
 
@@ -64,18 +120,43 @@ export function depthDistribution(quakes) {
         type: 'scatter',
         data: data,
         options: {
+            ...buildBaseOptions(),
             scales: {
-            x: {
-                type: 'linear',
-                position: 'bottom'
-            }
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        text: 'Profundidad (km)',
+                        color: theme.text
+                    },
+                    ticks: {
+                        color: theme.muted
+                    },
+                    grid: {
+                        color: theme.grid
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Magnitud',
+                        color: theme.text
+                    },
+                    ticks: {
+                        color: theme.muted
+                    },
+                    grid: {
+                        color: theme.grid
+                    }
+                }
             }
         }
     });
 
     let maxMag = 0;
     let minProf = 11000;
-    let dataMaxEvent;
+    let selectedQuake = null;
     quakes.forEach(quake => {
 
         const mag = quake.properties.mag;
@@ -91,24 +172,10 @@ export function depthDistribution(quakes) {
         ) {
             maxMag = mag;
             minProf = depth;
-
-            const date = new Date(quake.properties.time);
-            const formatted = `${date.getFullYear()}/${
-                String(date.getMonth() + 1).padStart(2, '0')
-            }/${
-                String(date.getDate()).padStart(2, '0')
-            }`;
-
-            dataMaxEvent =
-                formatted +
-                ' - Magnitud ' + maxMag +
-                ' - ' + minProf + 'km de profundidad - ' +
-                quake.properties.place +
-                ' - URL: ' +
-                quake.properties.url;
+            selectedQuake = quake;
         }
         
     })
 
-    return dataMaxEvent;
+    return selectedQuake;
 }
