@@ -9,6 +9,7 @@ export function renderMainData(quakes) {
 
 export function renderAll(quakes) {
   showSearchResults()
+  showResultsContent()
   renderTotal(quakes.length)
 
   const { mean, maxEvent } = getMagnitudeStats(quakes)
@@ -26,8 +27,6 @@ export function renderAll(quakes) {
 
   const lastQuakes = last5Earthquakes(quakes)
   renderLastQuakes(lastQuakes)
-
-  scrollToSearchResultsTitle()
 }
 
 function renderTotal(count) {
@@ -74,7 +73,12 @@ function renderProbabilityTable(data) {
   clearElement(table)
 
   const header = document.createElement('tr')
-  ;['Magnitud', 'Eventos', 'Probabilidad (1 año)', 'Riesgo'].forEach((text) => {
+  ;[
+    'Umbral de magnitud (historico)',
+    'Eventos historicos (base)',
+    'Probabilidad estimada (1 año)',
+    'Nivel de riesgo estimado'
+  ].forEach((text) => {
     const th = document.createElement('th')
     th.textContent = text
     header.appendChild(th)
@@ -98,15 +102,7 @@ function renderLastQuakes(lastQuakes) {
 
 export function renderNoResults(message = 'No hay terremotos para esta búsqueda.') {
   showSearchResults()
-  renderTotal(0)
-  renderMean('-')
-  document.getElementById('event-max-magnitude').textContent = message
-  document.getElementById('average-time-between').textContent = '-'
-  document.getElementById('max-event-depth-distribution').textContent = '-'
-  document.getElementById('probability-table').textContent = ''
-  document.getElementById('last-earthquakes').textContent = ''
-
-  scrollToSearchResultsTitle()
+  showEmptyState(message)
 }
 
 export function showLoading() {
@@ -118,17 +114,47 @@ export function hideLoading() {
 }
 
 function showSearchResults() {
-  document.getElementById('search-results').classList.remove('hidden')
-}
+  const searchResults = document.getElementById('search-results')
+  const globalHistory = document.getElementById('global-history')
 
-function scrollToSearchResultsTitle() {
-  const title = document.getElementById('search-results-title')
-
-  if (!title || typeof title.scrollIntoView !== 'function') {
-    return
+  if (searchResults) {
+    searchResults.classList.remove('hidden')
   }
 
-  title.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  if (globalHistory) {
+    globalHistory.classList.add('hidden')
+  }
+}
+
+function showResultsContent() {
+  const panel = document.getElementById('search-results')
+  const emptyState = document.getElementById('search-empty-state')
+
+  if (panel) {
+    panel.classList.remove('results-panel--empty')
+  }
+
+  if (emptyState) {
+    emptyState.classList.add('hidden')
+  }
+}
+
+function showEmptyState(message) {
+  const panel = document.getElementById('search-results')
+  const emptyState = document.getElementById('search-empty-state')
+  const emptyMessage = document.getElementById('search-empty-state-message')
+
+  if (panel) {
+    panel.classList.add('results-panel--empty')
+  }
+
+  if (emptyMessage) {
+    emptyMessage.textContent = message
+  }
+
+  if (emptyState) {
+    emptyState.classList.remove('hidden')
+  }
 }
 
 function clearElement(element) {
@@ -157,28 +183,6 @@ function appendUrlCell(row, url) {
   link.rel = 'noopener noreferrer'
   td.appendChild(link)
   row.appendChild(td)
-}
-
-function renderEarthquakesTable(table, earthquakes) {
-  clearElement(table)
-
-  const header = document.createElement('tr')
-  ;['Fecha', 'Magnitud (MB)', 'Profundidad', 'Lugar', 'Más información'].forEach((text) => {
-    const th = document.createElement('th')
-    th.textContent = text
-    header.appendChild(th)
-  })
-  table.appendChild(header)
-
-  earthquakes.forEach((row) => {
-    const tr = document.createElement('tr')
-    appendCell(tr, formatDate(row.properties.time))
-    appendCell(tr, String(row.properties.mag))
-    appendCell(tr, `${row.geometry.coordinates[2]}km`)
-    appendCell(tr, row.properties.place)
-    appendUrlCell(tr, row.properties.url)
-    table.appendChild(tr)
-  })
 }
 
 function renderEarthquakeCards(container, earthquakes) {

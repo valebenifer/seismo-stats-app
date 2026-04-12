@@ -115,7 +115,7 @@ function buildEarthquake(id) {
   }
 }
 
-describe('render search results scroll', () => {
+describe('render search results behavior', () => {
   let elements
   let renderAll
   let renderNoResults
@@ -123,10 +123,10 @@ describe('render search results scroll', () => {
   beforeEach(async () => {
     elements = {
       'search-results': createFakeElement('section'),
-      'search-results-title': {
-        ...createFakeElement('h2'),
-        scrollIntoView: vi.fn()
-      },
+      'global-history': createFakeElement('section'),
+      'search-results-title': createFakeElement('h2'),
+      'search-empty-state': createFakeElement('div'),
+      'search-empty-state-message': createFakeElement('p'),
       'total-earthquakes': createFakeElement('p'),
       'mean-magnitude': createFakeElement('p'),
       'event-max-magnitude': createFakeElement('div'),
@@ -138,6 +138,7 @@ describe('render search results scroll', () => {
     }
 
     elements['search-results'].classList.add('hidden')
+    elements['search-empty-state'].classList.add('hidden')
 
     vi.stubGlobal('document', {
       getElementById: vi.fn((id) => elements[id] ?? null),
@@ -153,23 +154,18 @@ describe('render search results scroll', () => {
     vi.unstubAllGlobals()
   })
 
-  it('scrolls to the results title after rendering data', () => {
+  it('shows search results after rendering data', () => {
     renderAll([buildEarthquake('q1'), buildEarthquake('q2')])
 
     expect(elements['search-results'].classList.contains('hidden')).toBe(false)
-    expect(elements['search-results-title'].scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start'
-    })
   })
 
-  it('scrolls to the results title when there are no results', () => {
+  it('shows empty state when there are no results', () => {
     renderNoResults('Sin resultados')
 
-    expect(elements['event-max-magnitude'].textContent).toBe('Sin resultados')
-    expect(elements['search-results-title'].scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start'
-    })
+    expect(elements['global-history'].classList.contains('hidden')).toBe(true)
+    expect(elements['search-results'].classList.contains('results-panel--empty')).toBe(true)
+    expect(elements['search-empty-state'].classList.contains('hidden')).toBe(false)
+    expect(elements['search-empty-state-message'].textContent).toBe('Sin resultados')
   })
 })
